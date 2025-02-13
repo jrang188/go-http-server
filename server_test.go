@@ -179,6 +179,13 @@ func assertLeague(t testing.TB, got, want []Player) {
 	}
 }
 
+func assertScoreEquals(t testing.TB, got, want int) {
+	t.Helper()
+	if got != want {
+		t.Errorf("got %d want %d", got, want)
+	}
+}
+
 func newLeagueRequest() *http.Request {
 	req, _ := http.NewRequest(http.MethodGet, "/league", nil)
 	return req
