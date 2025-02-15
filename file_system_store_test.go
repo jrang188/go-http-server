@@ -1,30 +1,31 @@
 package main
 
 import (
-	"io"
 	"os"
 	"testing"
 )
 
 func TestFileSystemStore(t *testing.T) {
-	t.Run("league from a reader", func(t *testing.T) {
+	t.Run("league sorted", func(t *testing.T) {
 		database, cleanDatabase := createTempFile(t, `[
-      {"Name": "Cleo", "Wins": 10},
-			{"Name": "Chris", "Wins": 33}
-      ]`)
+		{"Name": "Cleo", "Wins": 10},
+		{"Name": "Chris", "Wins": 33}]`)
 		defer cleanDatabase()
 
-		store := FileSystemPlayerStore{database}
+		store, err := NewFileSystemPlayerStore(database)
+
+		assertNoError(t, err)
 
 		got := store.GetLeague()
 
-		want := []Player{
-			{"Cleo", 10},
+		want := League{
 			{"Chris", 33},
+			{"Cleo", 10},
 		}
 
 		assertLeague(t, got, want)
 
+		// read again
 		got = store.GetLeague()
 		assertLeague(t, got, want)
 	})
@@ -35,7 +36,8 @@ func TestFileSystemStore(t *testing.T) {
 		{"Name": "Chris", "Wins": 33}]`)
 		defer cleanDatabase()
 
-		store := FileSystemPlayerStore{database}
+		store, err := NewFileSystemPlayerStore(database)
+		assertNoError(t, err)
 
 		got := store.GetPlayerScore("Chris")
 		want := 33
@@ -48,7 +50,8 @@ func TestFileSystemStore(t *testing.T) {
 		{"Name": "Chris", "Wins": 33}]`)
 		defer cleanDatabase()
 
-		store := FileSystemPlayerStore{database}
+		store, err := NewFileSystemPlayerStore(database)
+		assertNoError(t, err)
 
 		store.RecordWin("Chris")
 
@@ -56,9 +59,25 @@ func TestFileSystemStore(t *testing.T) {
 		want := 34
 		assertScoreEquals(t, got, want)
 	})
+
+	t.Run("store wins for new players", func(t *testing.T) {
+		database, cleanDatabase := createTempFile(t, `[
+		{"Name": "Cleo", "Wins": 10},
+		{"Name": "Chris", "Wins": 33}]`)
+		defer cleanDatabase()
+
+		store, err := NewFileSystemPlayerStore(database)
+		assertNoError(t, err)
+
+		store.RecordWin("Pepper")
+
+		got := store.GetPlayerScore("Pepper")
+		want := 1
+		assertScoreEquals(t, got, want)
+	})
 }
 
-func createTempFile(t testing.TB, initialData string) (io.ReadWriteSeeker, func()) {
+func createTempFile(t testing.TB, initialData string) (*os.File, func()) {
 	t.Helper()
 
 	tmpfile, err := os.CreateTemp("", "db")
@@ -74,4 +93,11 @@ func createTempFile(t testing.TB, initialData string) (io.ReadWriteSeeker, func(
 	}
 
 	return tmpfile, removeFile
+}
+
+func assertNoError(t testing.TB, err error) {
+	t.Helper()
+	if err != nil {
+		t.Fatalf("didn't expect an error but got one, %v", err)
+	}
 }
