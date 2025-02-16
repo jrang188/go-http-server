@@ -1,11 +1,11 @@
-package poker
+package main
 
 import (
 	"log"
 	"net/http"
 	"os"
 
-	"github.com/jrang188/go-http-server"
+	poker "github.com/jrang188/go-http-server"
 )
 
 const dbFileName = "game.db.json"
