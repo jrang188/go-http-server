@@ -22,7 +22,7 @@ func main() {
 	}
 
 	server := poker.NewPlayerServer(store)
-	if err := http.ListenAndServe(":5000", server); err != nil {
-		log.Fatal(http.ListenAndServe(":5000", server))
+	if err := http.ListenAndServe(":3333", server); err != nil {
+		log.Fatal(http.ListenAndServe(":3333", server))
 	}
 }
