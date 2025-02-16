@@ -5,7 +5,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	poker "github.com/jrang188/go-http-server"
+	poker "github.com/jrang188/go-poker"
 )
 
 func TestRecordingWinsAndRetrievingThem(t *testing.T) {

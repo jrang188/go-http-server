@@ -5,7 +5,7 @@ import (
 	"log"
 	"os"
 
-	poker "github.com/jrang188/go-http-server"
+	poker "github.com/jrang188/go-poker"
 )
 
 const dbFileName = "game.db.json"

@@ -4,7 +4,7 @@ import (
 	"strings"
 	"testing"
 
-	poker "github.com/jrang188/go-http-server"
+	poker "github.com/jrang188/go-poker"
 )
 
 func TestCLI(t *testing.T) {
