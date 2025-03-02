@@ -13,7 +13,10 @@ func TestRecordingWinsAndRetrievingThem(t *testing.T) {
 	defer cleanDatabase()
 	store, err := poker.NewFileSystemPlayerStore(database)
 	poker.AssertNoError(t, err)
-	server := poker.NewPlayerServer(store)
+	server, err := poker.NewPlayerServer(store, dummyGame)
+	if err != nil {
+		t.Fatalf("problem creating player server: %v", err)
+	}
 	player := "Pepper"
 
 	server.ServeHTTP(httptest.NewRecorder(), poker.NewPostWinRequest(player))

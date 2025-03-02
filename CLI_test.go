@@ -5,6 +5,7 @@ import (
 	"io"
 	"strings"
 	"testing"
+	"time"
 
 	poker "github.com/jrang188/go-poker"
 )
@@ -19,14 +20,16 @@ var (
 type GameSpy struct {
 	StartCalled     bool
 	StartCalledWith int
+	BlindAlert      []byte
 
 	FinishedCalled   bool
 	FinishCalledWith string
 }
 
-func (g *GameSpy) Start(numberOfPlayers int) {
+func (g *GameSpy) Start(numberOfPlayers int, out io.Writer) {
 	g.StartCalled = true
 	g.StartCalledWith = numberOfPlayers
+	out.Write(g.BlindAlert)
 }
 
 func (g *GameSpy) Finish(winner string) {
@@ -108,14 +111,24 @@ func assertGameNotFinished(t testing.TB, game *GameSpy) {
 
 func assertGameNotStarted(t testing.TB, game *GameSpy) {
 	t.Helper()
-	if game.StartCalled {
+
+	passed := retryUntil(500*time.Millisecond, func() bool {
+		return !game.StartCalled
+	})
+
+	if !passed {
 		t.Errorf("game should not have started")
 	}
 }
 
 func assertFinishCalledWith(t testing.TB, game *GameSpy, winner string) {
 	t.Helper()
-	if game.FinishCalledWith != winner {
+
+	passed := retryUntil(500*time.Millisecond, func() bool {
+		return game.FinishCalledWith == winner
+	})
+
+	if !passed {
 		t.Errorf("expected finish called with %q but got %q", winner, game.FinishCalledWith)
 	}
 }
@@ -134,4 +147,14 @@ func assertScheduledAlert(t testing.TB, got, want poker.ScheduledAlert) {
 	if got != want {
 		t.Errorf("got %+v, want %+v", got, want)
 	}
+}
+
+func retryUntil(d time.Duration, f func() bool) bool {
+	deadline := time.Now().Add(d)
+	for time.Now().Before(deadline) {
+		if f() {
+			return true
+		}
+	}
+	return false
 }

@@ -9,11 +9,6 @@ import (
 	"strings"
 )
 
-type Game interface {
-	Start(numberOfPlayers int)
-	Finish(winner string)
-}
-
 type CLI struct {
 	in   *bufio.Scanner
 	out  io.Writer
@@ -42,7 +37,7 @@ func (cli *CLI) PlayPoker() {
 		return
 	}
 
-	cli.game.Start(numberOfPlayers)
+	cli.game.Start(numberOfPlayers, cli.out)
 
 	winnerInput := cli.readLine()
 	winner, err := extractWinner(winnerInput)
