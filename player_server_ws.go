@@ -11,6 +11,11 @@ type playerServerWS struct {
 	*websocket.Conn
 }
 
+var wsUpgrader = websocket.Upgrader{
+	ReadBufferSize:  1024,
+	WriteBufferSize: 1024,
+}
+
 func (w *playerServerWS) Write(p []byte) (n int, err error) {
 	err = w.WriteMessage(websocket.TextMessage, p)
 	if err != nil {

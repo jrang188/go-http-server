@@ -7,8 +7,6 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
-
-	"github.com/gorilla/websocket"
 )
 
 type PlayerStore interface {
@@ -71,11 +69,6 @@ func (p *PlayerServer) playersHandler(w http.ResponseWriter, r *http.Request) {
 
 func (p *PlayerServer) gameHandler(w http.ResponseWriter, r *http.Request) {
 	p.template.Execute(w, nil)
-}
-
-var wsUpgrader = websocket.Upgrader{
-	ReadBufferSize:  1024,
-	WriteBufferSize: 1024,
 }
 
 func (p *PlayerServer) webSocket(w http.ResponseWriter, r *http.Request) {
